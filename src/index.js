@@ -1,12 +1,14 @@
 const SVG_WIDTH = window.screen.availWidth * 6 / 10;
 const SVG_HEIGHT = window.screen.availHeight * 7 / 10;
+const LEGEND_WIDTH = window.screen.availWidth * 2 / 10;
+const LEGEND_HEIGHT = window.screen.availHeight * 7 / 10;
 
 var tileColors = {};
 
 // Prints title and description to webpage.
 function createTitle(data) {
-    d3.select("body").append("h1").text("Video Game Sales").attr("id", "title");
-    d3.select("body").append("p").text(data.name).attr("id", "description");
+    d3.select("#title-div").append("h1").text("Video Game Sales").attr("id", "title");
+    d3.select("#title-div").append("p").text(data.name).attr("id", "description");
 }
 
 // Select a color for each tile group.
@@ -18,9 +20,8 @@ function selectColors(data) {
 
 // Create the tree map.
 function createSVG(data) {
-    const svg = d3.select('body').append('svg')
+    const svg = d3.select('#main-content').append('svg')
         .attr("width", SVG_WIDTH).attr("height", SVG_HEIGHT)
-        .style("background-color", "#DDDDDD")
         .append("g");
 
     selectColors(data);
@@ -75,9 +76,46 @@ function createSVG(data) {
                 .attr("y", (d, i) => {return d.y + 10*i});
 }
 
+function createLegend() {
+    var legend = d3.select("#main-content")
+        .append('svg')
+        .attr("width", LEGEND_WIDTH).attr("height", LEGEND_HEIGHT)
+        .append('g')
+        .attr('id', 'legend');
+
+    legend
+        .selectAll("rect")
+        .data(Object.keys(tileColors))
+        .enter()
+        .append("rect")
+        .attr("id", "legend-item")
+        .attr("width", LEGEND_HEIGHT/(Object.keys(tileColors).length*2))
+        .attr("height", LEGEND_HEIGHT/(Object.keys(tileColors).length*2))
+        .attr("x", LEGEND_WIDTH/5)
+        .attr("y", (d, i) => {
+            return LEGEND_HEIGHT * i / Object.keys(tileColors).length;
+        })
+        .style("fill", d => tileColors[d])
+    
+    legend
+        .selectAll("text")
+        .data(Object.keys(tileColors))
+        .enter()
+        .append("text")
+        .text(d => d)
+        .attr("font-size", LEGEND_HEIGHT/(Object.keys(tileColors).length*2) + "px")
+        .attr("x", LEGEND_WIDTH/5 + LEGEND_HEIGHT/(Object.keys(tileColors).length*2) * 2)
+        .attr("y", (d, i) => {
+            return LEGEND_HEIGHT * i / Object.keys(tileColors).length + LEGEND_HEIGHT/(Object.keys(tileColors).length*2);
+        });
+    
+
+}
+
 fetch("https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/video-game-sales-data.json")
     .then(response => response.json())
     .then(data => {
         createTitle(data);
         createSVG(data);
+        createLegend();
     });
