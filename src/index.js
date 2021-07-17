@@ -58,14 +58,12 @@ function createSVG(data) {
         .append("text")
         .attr('x', d => {return d.x0+5})
         .attr('y', d => {return d.y0+10})
-        .text(d => { return d.data.name })
+        .text(d => {
+            var text = d.data.name.replace(" ", "\n");
+            return text;
+        })
         .attr("font-size", "10px")
         .attr("fill", "black");
-}
-
-// For testing purposes.
-function showData(data) {
-    d3.select("body").append("p").text(JSON.stringify(data.children[1])).attr("id", "data");
 }
 
 fetch("https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/video-game-sales-data.json")
@@ -73,5 +71,4 @@ fetch("https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/video-ga
     .then(data => {
         createTitle(data);
         createSVG(data);
-        showData(data);
     });
