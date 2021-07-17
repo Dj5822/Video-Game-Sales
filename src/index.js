@@ -20,6 +20,20 @@ function selectColors(data) {
 
 // Create the tree map.
 function createSVG(data) {
+    var tooltip = d3.select('body').append('div')
+            .attr("id", "tooltip")
+            .attr("data-value", "")
+            .style("width", "200px")
+            .style("height", "150px")
+            .style("opacity", 0)
+            .style("text-align", "center")
+            .style("left", window.screen.availWidth - 400 + "px")
+            .style("top", "0px");
+    
+    var tooltipName = tooltip.append("text");
+    var tooltipCategory = tooltip.append("text");
+    var tooltipValue = tooltip.append("text");
+
     const svg = d3.select('#main-content').append('svg')
         .attr("width", SVG_WIDTH).attr("height", SVG_HEIGHT)
         .append("g");
@@ -47,7 +61,21 @@ function createSVG(data) {
             .attr("data-name", d => {return d.data.name})
             .attr("data-category", d => {return d.data.category})
             .attr("data-value", d => {return d.data.value})
-            .style("fill", d => {return tileColors[d.data.category]});    
+            .style("fill", d => {return tileColors[d.data.category]})
+            .on("mouseover", (d, i) => {
+                tooltipName.text(d.data.name);
+                tooltipCategory.text("Category: " + d.data.category);
+                tooltipValue.text("Value: " + d.data.value);
+                tooltip.style("opacity", 1);
+            })
+            .on("mouseout", (d, i) => {
+                tooltip.style("opacity", 0);
+            });
+            
+    onmousemove = function(e){
+        tooltip.style("left", e.clientX + 10 + "px");
+        tooltip.style("top", e.clientY - 90 + "px");
+    };
             
     // Adds text to the treemap.
     svg

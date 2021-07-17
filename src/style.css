@@ -18,3 +18,17 @@ body {
     display: flex;
     flex-direction: row;
 }
+
+#tooltip {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    background-color: #f3fc7c;
+    color: black;
+    justify-content: center;
+    align-items: center;
+    border-radius: 7px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  
