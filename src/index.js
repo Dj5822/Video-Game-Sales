@@ -113,7 +113,7 @@ function createSVG(data) {
         .data(Object.keys(tileColors))
         .enter()
         .append("rect")
-        .attr("id", "legend-item")
+        .attr("class", "legend-item")
         .attr("width", SVG_HEIGHT/(Object.keys(tileColors).length*2))
         .attr("height", SVG_HEIGHT/(Object.keys(tileColors).length*2))
         .attr("x", SVG_WIDTH*15/18)
