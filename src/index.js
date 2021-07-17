@@ -1,7 +1,7 @@
-const SVG_WIDTH = window.screen.availWidth * 9 / 10;
+const SVG_WIDTH = window.screen.availWidth * 6 / 10;
 const SVG_HEIGHT = window.screen.availHeight * 7 / 10;
 
-var tileColors = [];
+var tileColors = {};
 
 // Prints title and description to webpage.
 function createTitle(data) {
@@ -9,10 +9,10 @@ function createTitle(data) {
     d3.select("body").append("p").text(data.name).attr("id", "description");
 }
 
-// Add a bunch of colors to tileColors list.
-function selectColors(numberOfColors) {
-    for (let i=0; i<numberOfColors; i++) {
-        tileColors.push("hsl(" + Math.floor(i * 255 / numberOfColors) + ",86%,70%)");
+// Select a color for each tile group.
+function selectColors(data) {
+    for (let i=0; i<data.children.length; i++) {
+        tileColors[data.children[i].name] = "hsl(" + Math.floor((data.children.length-i-1) * 255 / data.children.length) + ",90%,40%)";
     }
 }
 
@@ -20,29 +20,42 @@ function selectColors(numberOfColors) {
 function createSVG(data) {
     const svg = d3.select('body').append('svg')
         .attr("width", SVG_WIDTH).attr("height", SVG_HEIGHT)
-        .style("background-color", "#DDDDDD");
+        .style("background-color", "#DDDDDD")
+        .append("g");
 
-    selectColors(parseInt(data.children.length));
-    
-    svg.append("rect")
-        .attr("width", 200)
-        .attr("height", 200)
-        .attr("x", 150)
-        .attr("y", 150)
-        .style("fill", tileColors[0])
-        .attr("class", "tile");
-        
+    selectColors(data);
+
+    var root = d3.hierarchy(data).sum(d => {return d.value});
+
+    d3.treemap()
+        .size([SVG_WIDTH, SVG_HEIGHT])
+        .padding(2)
+        (root);
+
+    // Adds rectangles to the treemap.
+    svg
+        .selectAll("rect")
+        .data(root.leaves())
+        .enter()
+        .append("rect")
+            .attr('x', d => {return d.x0})
+            .attr('y', d => {return d.y0})
+            .attr('width', d => {return d.x1 - d.x0})
+            .attr('height', d => {return d.y1 - d.y0})
+            .style("fill", d => {
+                return tileColors[d.data.category];
+            });        
 }
 
 // For testing purposes.
 function showData(data) {
-    d3.select("body").append("p").text(JSON.stringify(data.children)).attr("id", "data");
+    d3.select("body").append("p").text(JSON.stringify(data.children[1])).attr("id", "data");
 }
 
 fetch("https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/video-game-sales-data.json")
     .then(response => response.json())
-        .then(data => {
-            createTitle(data);
-            createSVG(data);
-            showData(data);
-        });
+    .then(data => {
+        createTitle(data);
+        createSVG(data);
+        showData(data);
+    });
