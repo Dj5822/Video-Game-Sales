@@ -42,6 +42,10 @@ function createSVG(data) {
             .attr('y', d => {return d.y0})
             .attr('width', d => {return d.x1 - d.x0})
             .attr('height', d => {return d.y1 - d.y0})
+            .attr("class", "tile")
+            .attr("data-name", d => {return d.data.name})
+            .attr("data-category", d => {return d.data.category})
+            .attr("data-value", d => {return d.data.value})
             .style("fill", d => {
                 return tileColors[d.data.category];
             });    
