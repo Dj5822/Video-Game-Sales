@@ -12,7 +12,7 @@ function createTitle(data) {
 // Select a color for each tile group.
 function selectColors(data) {
     for (let i=0; i<data.children.length; i++) {
-        tileColors[data.children[i].name] = "hsl(" + Math.floor((data.children.length-i-1) * 255 / data.children.length) + ",90%,40%)";
+        tileColors[data.children[i].name] = "hsl(" + Math.floor((data.children.length-i-1) * 255 / data.children.length) + ",100%,70%)";
     }
 }
 
@@ -44,7 +44,19 @@ function createSVG(data) {
             .attr('height', d => {return d.y1 - d.y0})
             .style("fill", d => {
                 return tileColors[d.data.category];
-            });        
+            });    
+            
+    // Adds text to the treemap.
+    svg
+        .selectAll("text")
+        .data(root.leaves())
+        .enter()
+        .append("text")
+        .attr('x', d => {return d.x0+5})
+        .attr('y', d => {return d.y0+10})
+        .text(d => { return d.data.name })
+        .attr("font-size", "10px")
+        .attr("fill", "black");
 }
 
 // For testing purposes.
