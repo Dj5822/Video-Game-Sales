@@ -46,9 +46,7 @@ function createSVG(data) {
             .attr("data-name", d => {return d.data.name})
             .attr("data-category", d => {return d.data.category})
             .attr("data-value", d => {return d.data.value})
-            .style("fill", d => {
-                return tileColors[d.data.category];
-            });    
+            .style("fill", d => {return tileColors[d.data.category]});    
             
     // Adds text to the treemap.
     svg
@@ -56,14 +54,25 @@ function createSVG(data) {
         .data(root.leaves())
         .enter()
         .append("text")
-        .attr('x', d => {return d.x0+5})
-        .attr('y', d => {return d.y0+10})
-        .text(d => {
-            var text = d.data.name.replace(" ", "\n");
-            return text;
-        })
-        .attr("font-size", "10px")
-        .attr("fill", "black");
+            .selectAll("tspan")
+            .data(d => {
+                var tspanElements = [];
+                d.data.name.split(" ").forEach(x => {
+                    tspanElements.push({
+                        text: x, 
+                        x: d.x0+5, 
+                        y: d.y0+10
+                    });
+                });
+                return tspanElements;
+            })
+            .enter()
+                .append("tspan")
+                .text(d => {return d.text})
+                .attr("font-size", "10px")
+                .attr("fill", "black")
+                .attr("x", d => {return d.x})
+                .attr("y", (d, i) => {return d.y + 10*i});
 }
 
 fetch("https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/video-game-sales-data.json")
